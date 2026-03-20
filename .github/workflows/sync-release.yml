@@ -1,0 +1,119 @@
+name: Sync Private Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_tag:
+        description: Release tag to copy from the private source repository
+        required: true
+        default: v0.1.0-preview.1
+      source_repo:
+        description: Private source repository
+        required: true
+        default: lifu777/SDOH
+
+permissions:
+  contents: write
+
+jobs:
+  sync-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout public release repo
+        uses: actions/checkout@v5
+
+      - name: Download source release assets
+        env:
+          GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          SOURCE_REPO: ${{ inputs.source_repo }}
+          SOURCE_TAG: ${{ inputs.source_tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          gh release download "$SOURCE_TAG" \
+            --repo "$SOURCE_REPO" \
+            --pattern "SDOH.Data.Explorer-*.dmg" \
+            --pattern "SDOH.Data.Explorer-*.exe" \
+            --pattern "SHA256SUMS.txt" \
+            --dir artifacts
+
+      - name: Refresh checksum file
+        run: |
+          set -euo pipefail
+          cd artifacts
+          shasum -a 256 *.dmg *.exe > SHA256SUMS.txt
+
+      - name: Generate release notes
+        env:
+          SOURCE_TAG: ${{ inputs.source_tag }}
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<EOF
+          # SDOH Data Explorer ${SOURCE_TAG#v}
+
+          ## Downloads
+
+          - \`SDOH.Data.Explorer-0.1.0-mac-arm64.dmg\`
+          - \`SDOH.Data.Explorer-0.1.0-win-x64-setup.exe\`
+          - \`SHA256SUMS.txt\`
+
+          ## Before You Launch
+
+          Install **R 4.5.x** first:
+
+          - [CRAN](https://cran.r-project.org/)
+
+          This desktop build is a lightweight launcher. It does not bundle R or a preinstalled package library.
+
+          ## Installation
+
+          ### macOS
+
+          1. Download the \`.dmg\`.
+          2. Move **SDOH Data Explorer.app** into \`Applications\`.
+          3. Open the app.
+
+          ### Windows
+
+          1. Download the \`.exe\`.
+          2. Run the installer.
+          3. Open **SDOH Data Explorer**.
+
+          ## First Launch Checks
+
+          The launcher checks for:
+
+          - local \`Rscript\`
+          - \`R 4.5.x\`
+          - required R packages
+
+          If packages are missing, the app will display the exact \`renv::restore(...)\` command to run manually in R or RStudio.
+
+          ## Notes
+
+          - macOS build: Apple Silicon only
+          - current macOS build is unsigned / not notarized
+          EOF
+
+      - name: Publish or update public release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_TAG: ${{ inputs.source_tag }}
+        run: |
+          set -euo pipefail
+          RELEASE_TITLE="SDOH Data Explorer ${SOURCE_TAG#v}"
+
+          if gh release view "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$SOURCE_TAG" artifacts/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$SOURCE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md
+          else
+            gh release create "$SOURCE_TAG" artifacts/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md \
+              --prerelease
+          fi
