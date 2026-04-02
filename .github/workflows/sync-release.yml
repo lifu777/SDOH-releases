@@ -6,7 +6,6 @@ on:
       source_tag:
         description: Release tag to copy from the private source repository
         required: true
-        default: v0.1.0-preview.1
       source_repo:
         description: Private source repository
         required: true
@@ -44,19 +43,29 @@ jobs:
           cd artifacts
           shasum -a 256 *.dmg *.exe > SHA256SUMS.txt
 
-      - name: Generate release notes
+      - name: Generate current release docs
         env:
           SOURCE_TAG: ${{ inputs.source_tag }}
         run: |
           set -euo pipefail
-          cat > release-notes.md <<EOF
-          # SDOH Data Explorer ${SOURCE_TAG#v}
+          RELEASE_LABEL="${SOURCE_TAG#v}"
+          RELEASE_DISPLAY="$(printf '%s' "$RELEASE_LABEL" | sed -E 's/-preview[.]?/ Preview /g; s/-rc[.]?/ RC /g; s/-/ /g')"
+          MAC_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${SOURCE_TAG}/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg"
+          WIN_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${SOURCE_TAG}/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe"
+          SHA_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${SOURCE_TAG}/SHA256SUMS.txt"
+
+          cp artifacts/SHA256SUMS.txt SHA256SUMS.txt
+
+          cat > LATEST-RELEASE.md <<EOF
+          # Current Public Build
+
+          Current public build: **SDOH Data Explorer ${RELEASE_DISPLAY}**
 
           ## Downloads
 
-          - \`SDOH.Data.Explorer-0.1.0-mac-arm64.dmg\`
-          - \`SDOH.Data.Explorer-0.1.0-win-x64-setup.exe\`
-          - \`SHA256SUMS.txt\`
+          - [macOS (Apple Silicon)](${MAC_URL})
+          - [Windows (x64)](${WIN_URL})
+          - [SHA256 checksums](${SHA_URL})
 
           ## Before You Launch
 
@@ -96,13 +105,120 @@ jobs:
           - current macOS build is unsigned / not notarized
           EOF
 
+          cat > README.md <<EOF
+          # SDOH Data Explorer Downloads
+
+          This repository is the public download channel for **SDOH Data Explorer** desktop builds.
+
+          The application source code remains in a separate private repository. This repository only contains current download links, checksums, and end-user installation guidance.
+
+          ## Download The Current Build
+
+          Current public build: **SDOH Data Explorer ${RELEASE_DISPLAY}**
+
+          - [Download for macOS (Apple Silicon)](${MAC_URL})
+          - [Download for Windows (x64)](${WIN_URL})
+          - [Download SHA256 checksums](${SHA_URL})
+          - [Installation and first-launch notes](./LATEST-RELEASE.md)
+
+          Older GitHub releases may still exist for rollback and verification, but this page only links to the current public build.
+
+          ## Platform Support
+
+          - macOS: Apple Silicon (\`arm64\`)
+          - Windows: \`x64\`
+
+          ## Prerequisite
+
+          Install **R 4.5.x** before launching the desktop app:
+
+          - [Download R from CRAN](https://cran.r-project.org/)
+
+          The desktop app is a lightweight launcher. It does **not** bundle R or a preinstalled package library.
+
+          ## Checksum Verification
+
+          Use \`SHA256SUMS.txt\` from this repository root or from the current build links above to verify downloads.
+
+          Examples:
+
+          \`\`\`bash
+          shasum -a 256 "SDOH.Data.Explorer-0.1.0-mac-arm64.dmg"
+          certutil -hashfile "SDOH.Data.Explorer-0.1.0-win-x64-setup.exe" SHA256
+          \`\`\`
+
+          ## Support Scope
+
+          This repository is limited to release distribution and installation notes.
+
+          Issues related to:
+
+          - downloading release assets
+          - checksum mismatches
+          - basic desktop installation problems
+
+          can be tracked here. Application source development remains in the private project repository.
+          EOF
+
+          cat > release-notes.md <<EOF
+          # SDOH Data Explorer ${RELEASE_DISPLAY}
+
+          ## Downloads
+
+          - [macOS (Apple Silicon)](${MAC_URL})
+          - [Windows (x64)](${WIN_URL})
+          - [SHA256 checksums](${SHA_URL})
+
+          ## Before You Launch
+
+          Install **R 4.5.x** first:
+
+          - [CRAN](https://cran.r-project.org/)
+
+          This desktop build is a lightweight launcher. It does not bundle R or a preinstalled package library.
+
+          ## Installation
+
+          ### macOS
+
+          1. Download the \`.dmg\`.
+          2. Move **SDOH Data Explorer.app** into \`Applications\`.
+          3. Open the app.
+
+          ### Windows
+
+          1. Download the \`.exe\`.
+          2. Run the installer.
+          3. Open **SDOH Data Explorer**.
+
+          ## First Launch Checks
+
+          The launcher checks for:
+
+          - local \`Rscript\`
+          - \`R 4.5.x\`
+          - required R packages
+
+          If packages are missing, the app will display the exact \`renv::restore(...)\` command to run manually in R or RStudio.
+
+          ## Notes
+
+          - macOS build: Apple Silicon only
+          - current macOS build is unsigned / not notarized
+          EOF
+
+      - name: Clean up legacy release note files
+        run: |
+          set -euo pipefail
+          find . -maxdepth 1 -name 'release-notes-v*.md' -delete
+
       - name: Publish or update public release
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_TAG: ${{ inputs.source_tag }}
         run: |
           set -euo pipefail
-          RELEASE_TITLE="SDOH Data Explorer ${SOURCE_TAG#v}"
+          RELEASE_TITLE="SDOH Data Explorer $(printf '%s' "${SOURCE_TAG#v}" | sed -E 's/-preview[.]?/ Preview /g; s/-rc[.]?/ RC /g; s/-/ /g')"
 
           if gh release view "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$SOURCE_TAG" artifacts/* --repo "$GITHUB_REPOSITORY" --clobber
@@ -117,3 +233,21 @@ jobs:
               --notes-file release-notes.md \
               --prerelease
           fi
+
+      - name: Remove temporary release files
+        run: |
+          set -euo pipefail
+          rm -rf artifacts release-notes.md
+
+      - name: Commit current release pointers
+        run: |
+          set -euo pipefail
+          if git diff --quiet && [ -z "$(git ls-files --deleted)" ]; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A .
+          git commit -m "Update public release pointers for ${{ inputs.source_tag }}"
+          git push
