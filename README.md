@@ -1,21 +1,19 @@
-# SDOH Data Explorer Releases
+# SDOH Data Explorer Downloads
 
 This repository is the public download channel for **SDOH Data Explorer** desktop builds.
 
-The application source code remains in a separate private repository. This repository only contains release assets, checksums, and end-user installation guidance.
+The application source code remains in a separate private repository. This repository only contains current download links, checksums, and end-user installation guidance.
 
-## Latest Release
+## Download The Current Build
 
-Download the latest installers from:
+Current public build: **SDOH Data Explorer 0.1.0 Preview 2**
 
-- [Releases](https://github.com/lifu777/SDOH-releases/releases)
-- [v0.1.0-preview.1](https://github.com/lifu777/SDOH-releases/releases/tag/v0.1.0-preview.1)
+- [Download for macOS (Apple Silicon)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg)
+- [Download for Windows (x64)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe)
+- [Download SHA256 checksums](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SHA256SUMS.txt)
+- [Installation and first-launch notes](./LATEST-RELEASE.md)
 
-Available assets in `v0.1.0-preview.1`:
-
-- `SDOH.Data.Explorer-0.1.0-mac-arm64.dmg`
-- `SDOH.Data.Explorer-0.1.0-win-x64-setup.exe`
-- `SHA256SUMS.txt`
+Older GitHub releases may still exist for rollback and verification, but this page only links to the current public build.
 
 ## Platform Support
 
@@ -30,42 +28,9 @@ Install **R 4.5.x** before launching the desktop app:
 
 The desktop app is a lightweight launcher. It does **not** bundle R or a preinstalled package library.
 
-## Installation
-
-### macOS
-
-1. Install `R 4.5.x`.
-2. Download `SDOH.Data.Explorer-0.1.0-mac-arm64.dmg` from the latest release.
-3. Open the `.dmg` and move **SDOH Data Explorer.app** into `Applications`.
-4. Launch the app.
-
-Notes:
-
-- This build is for Apple Silicon only.
-- The app is currently unsigned / not notarized.
-
-### Windows
-
-1. Install `R 4.5.x`.
-2. Download `SDOH.Data.Explorer-0.1.0-win-x64-setup.exe` from the latest release.
-3. Run the installer.
-4. Launch **SDOH Data Explorer** from the Start menu or desktop shortcut.
-
-## First Launch Behavior
-
-On launch, the desktop app checks for:
-
-- `Rscript` on the local machine
-- a compatible `R 4.5.x` version
-- required R packages for the application
-
-If R is missing, the launcher will stop and show an installation prompt.
-
-If required packages are missing, the launcher will stop and show the exact `renv::restore(...)` command to run in R or RStudio. The launcher does not install packages automatically in this build.
-
 ## Checksum Verification
 
-Use `SHA256SUMS.txt` from the same release to verify downloads.
+Use `SHA256SUMS.txt` from this repository root or from the current build links above to verify downloads.
 
 Examples:
 
