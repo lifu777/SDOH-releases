@@ -1,2 +1,2 @@
-b93cc2f03330476951955169bd71111eceb854f2008ba91c013f971f55e09bdc  SDOH.Data.Explorer-0.1.0-mac-arm64.dmg
-f10e438579c43a8dc6352a366b3fb20f9551c58986bd5ce6372db41334f7bb9d  SDOH.Data.Explorer-0.1.0-win-x64-setup.exe
+ebd1c09fde73a57f8ac10a6b9383b517885568507afa143bb56b43bcc551a91b  SDOH.Data.Explorer-0.1.0-mac-arm64.dmg
+032cdfd462b8759c08c9786ecaa9d1eea2f067a462008eebcc8b67eee6e0c619  SDOH.Data.Explorer-0.1.0-win-x64-setup.exe
