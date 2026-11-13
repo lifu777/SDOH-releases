@@ -6,11 +6,11 @@ The application source code remains in a separate private repository. This repos
 
 ## Download The Current Build
 
-Current public build: **SDOH Data Explorer 0.1.0 Preview 2**
+Current public build: **SDOH Data Explorer 0.1.0 Preview 3**
 
-- [Download for macOS (Apple Silicon)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg)
-- [Download for Windows (x64)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe)
-- [Download SHA256 checksums](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SHA256SUMS.txt)
+- [Download for macOS (Apple Silicon)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg)
+- [Download for Windows (x64)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe)
+- [Download SHA256 checksums](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SHA256SUMS.txt)
 - [Installation and first-launch notes](./LATEST-RELEASE.md)
 
 Older GitHub releases may still exist for rollback and verification, but this page only links to the current public build.

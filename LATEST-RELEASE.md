@@ -1,12 +1,12 @@
 # Current Public Build
 
-Current public build: **SDOH Data Explorer 0.1.0 Preview 2**
+Current public build: **SDOH Data Explorer 0.1.0 Preview 3**
 
 ## Downloads
 
-- [macOS (Apple Silicon)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg)
-- [Windows (x64)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe)
-- [SHA256 checksums](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.2/SHA256SUMS.txt)
+- [macOS (Apple Silicon)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SDOH.Data.Explorer-0.1.0-mac-arm64.dmg)
+- [Windows (x64)](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SDOH.Data.Explorer-0.1.0-win-x64-setup.exe)
+- [SHA256 checksums](https://github.com/lifu777/SDOH-releases/releases/download/v0.1.0-preview.3/SHA256SUMS.txt)
 
 ## Before You Launch
 
